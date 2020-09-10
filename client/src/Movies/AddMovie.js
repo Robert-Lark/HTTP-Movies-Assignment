@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
@@ -21,33 +21,29 @@ const initialState = {
 	stars: [],
 };
 
-function UpdateMovie(props) {
-	const [update, setUpdate] = useState(initialState);
+function AddMovie(props) {
+	const [add, setAdd] = useState(initialState);
 	const { push } = useHistory();
 	const { id } = useParams();
-	useEffect(() => {
-		axios
-			.get(`http://localhost:5000/api/movies/${id}`)
-			.then((res) => {
-				setUpdate(res.data);
-			})
-			.catch((err) => console.log(err));
-	}, [id]);
+
 	const classes = useStyles();
+
 	const submit = (e) => {
 		e.preventDefault();
-		console.log(update);
 		axios
-			.put(`http://localhost:5000/api/movies/${id}`, update)
+			.post(`http://localhost:5000/api/movies/`, add)
 			.then((res) => {
-				setUpdate(res.data)
-				push("/movies")
+				props.setMovieList(res.data);
+				push("/movies");
 			})
 			.catch((err) => console.log("error: ", err));
 	};
 
 	const changeHandler = (e) => {
-		setUpdate({ ...update, [e.target.name]: e.target.value });
+        const value =
+            e.target.name === 'stars' ? [e.target.value] : e.target.value;
+        setAdd({ ...add, [e.target.name]: value });
+        console.log(add)
 	};
 
 	return (
@@ -57,7 +53,7 @@ function UpdateMovie(props) {
 					onChange={changeHandler}
 					label="id"
 					name="id"
-					value={update.id}
+					value={add.id || ""}
 					required
 				/>
 				<Form.Element
@@ -65,21 +61,21 @@ function UpdateMovie(props) {
 					label="title"
 					name="title"
 					type="email"
-					value={update.title}
+					value={add.title || ""}
 					required
 				/>
 				<Form.Element
 					onChange={changeHandler}
 					label="director"
-					value={update.director}
+					value={add.director || ""}
 					name="director"
 					required
 				/>
 				<Form.Element
 					label="metascore"
 					name="metascore"
-					value={update.metascore}
-					type="email"
+					value={add.metascore || ""}
+					type="metascore"
 					onChange={changeHandler}
 					required
 				/>
@@ -87,18 +83,17 @@ function UpdateMovie(props) {
 				<Form.Element
 					onChange={changeHandler}
 					label="stars"
-					value={update.stars}
+					value={add.stars || ""}
 					name="stars"
 					type="text"
 					required
 				/>
 			</Form>
 			<Button onClick={submit} value="value" variant="contained">
-				UPDATE MOVIE
+				ADD MOVIE
 			</Button>
-		
 		</Grid>
 	);
 }
 
-export default UpdateMovie;
+export default AddMovie;

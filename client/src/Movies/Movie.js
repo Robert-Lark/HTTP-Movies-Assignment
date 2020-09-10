@@ -7,7 +7,7 @@ import { useHistory } from "react-router-dom";
 //import UpdateMovie from "./UpdateMovie";
 
 function Movie({ addToSavedList }) {
-  const {push} = useHistory();
+	const { push } = useHistory();
 	const [movie, setMovie] = useState(null);
 	const params = useParams();
 
@@ -21,6 +21,16 @@ function Movie({ addToSavedList }) {
 	const saveMovie = () => {
 		addToSavedList(movie);
 	};
+	const deleteMovie = (e) => {
+		e.preventDefault();
+	axios
+		.delete(`http://localhost:5000/api/movies/${movie.id}`)
+		.then((res) => {
+			setMovie(res.data)
+			push("/movies")
+		})
+.catch(err => console.log(err))
+	};
 
 	useEffect(() => {
 		fetchMovie(params.id);
@@ -33,18 +43,23 @@ function Movie({ addToSavedList }) {
 	return (
 		<div className="save-wrapper">
 			<MovieCard movie={movie} />
-
 			<div className="save-button" onClick={saveMovie}>
 				Save
 			</div>
 			<div>
-						<Button
-							onClick={() => push(`/update-item/${movie.id}`)}
-							value="value"
-							variant="contained"
-						>
-							UPDATE MOVIE
-						</Button>
+				<Button
+					onClick={() => push(`/update-item/${movie.id}`)}
+					value="value"
+					variant="contained"
+				>
+					UPDATE MOVIE
+				</Button>
+			</div>
+
+			<div>
+				<Button onClick={deleteMovie} value="value" variant="contained">
+					DELETE MOVIE
+				</Button>
 			</div>
 		</div>
 	);
